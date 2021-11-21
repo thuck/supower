@@ -1,9 +1,9 @@
 #!/usr/bin/python
-
-import dbus
-import click
+# pylint: disable=missing-module-docstring
 import json
 import sys
+import dbus
+import click
 
 TOOLTIP = """native-path:          {NativePath}
 vendor:               {Vendor}
@@ -56,15 +56,18 @@ PROPERTIES = {
     'Percentage': None,
     'PowerSupply': FBOOL,
     'Serial': None,
-    'State': ('unknown', 'charging', 'discharging', 'empty', 'fully charged', 'pending charge', 'pending discharge'),
-    'Technology': ('unknown', 'lithium ion', 'lithium polymer', 'lithium iron phosphate', 'lead acid', 'nickel cadmium', 'nickel metal hydride'),
+    'State': ('unknown', 'charging', 'discharging', 'empty', 'fully charged',
+              'pending charge','pending discharge'),
+    'Technology': ('unknown', 'lithium ion', 'lithium polymer', 'lithium iron phosphate',
+                   'lead acid', 'nickel cadmium', 'nickel metal hydride'),
     'Temperature': None,
     'TimeToEmpty': None,
     'TimeToFull': None,
-    'Type': ('unknown', 'line-power', 'battery', 'ups', 'monitor', 'mouse', 'keyboard', 'pda', 'phone', 'media-player',
-            'tablet', 'computer', 'gaming_input', 'pen', 'touchpad', 'modem', 'network', 'headset', 'speakers',
-            'headphones', 'video', 'other_audio', 'remote_control', 'printer', 'scanner', 'camera', 'wearable',
-            'toy', 'bluetooth-generic'),
+    'Type': ('unknown', 'line-power', 'battery', 'ups', 'monitor', 'mouse', 'keyboard',
+             'pda', 'phone', 'media-player', 'tablet', 'computer', 'gaming_input',
+             'pen', 'touchpad', 'modem', 'network', 'headset', 'speakers',
+             'headphones', 'video', 'other_audio', 'remote_control', 'printer', 'scanner',
+             'camera', 'wearable', 'toy', 'bluetooth-generic'),
     'UpdateTime': None,
     'Vendor': None,
     'Voltage': None,
@@ -73,7 +76,8 @@ PROPERTIES = {
 
 
 def device_info(bus, device):
-    result = {'all': []}
+    """Lookup device properties"""
+    result = {}
     device_proxy = bus.get_object('org.freedesktop.UPower', device)
     device_interface = dbus.Interface(device_proxy, 'org.freedesktop.DBus.Properties')
     for _property, friendly_name in PROPERTIES.items():
@@ -85,14 +89,19 @@ def device_info(bus, device):
 
     return result
 
+
 def get_devices(bus):
+    """Retrieve list of Upower devices"""
     devices_proxy = bus.get_object('org.freedesktop.UPower', '/org/freedesktop/UPower')
     devices_interface = dbus.Interface(devices_proxy, 'org.freedesktop.UPower')
     devices = devices_interface.EnumerateDevices()
 
     return devices
 
+
 def get_device(bus, devices, device):
+    """Retrieve Upower device using path or model"""
+
     if device in devices:
         return device
 
@@ -103,19 +112,22 @@ def get_device(bus, devices, device):
 
     raise Exception("Device Not Found")
 
+
 def output_devices(bus, devices):
+    """Output device list"""
     for device in devices:
         print(f'{device}\t{device_info(bus, device).get("Model")}')
     sys.exit(0)
 
+
 @click.command()
 @click.option('--list-devices', is_flag=True, help='List devices and models')
 @click.option('--device', '--model', help='Path or Model')
-@click.option('--text', show_default = True, default="{Model}")
-@click.option('--alt', show_default = True, default="{BatteryLevel}")
+@click.option('--text', show_default=True, default="{Model}")
+@click.option('--alt', show_default=True, default="{BatteryLevel}")
 @click.option('--tooltip', default=TOOLTIP, help="Similar to upower -i <device>")
-@click.option('--class', '_class', show_default = True, default="{BatteryLevel}")
-@click.option('--percentage', show_default = True, default="{Percentage:.0f}")
+@click.option('--class', '_class', show_default=True, default="{BatteryLevel}")
+@click.option('--percentage', show_default=True, default="{Percentage:.0f}")
 def main(list_devices, device, text, alt, tooltip, _class, percentage):
     """
     TEXT can be replaced using one or more {KEY}\n
@@ -136,7 +148,6 @@ def main(list_devices, device, text, alt, tooltip, _class, percentage):
     if list_devices:
         output_devices(bus, devices)
 
-
     try:
         device = get_device(bus, devices, device)
         info = device_info(bus, device)
@@ -147,11 +158,12 @@ def main(list_devices, device, text, alt, tooltip, _class, percentage):
             "class": _class.format(**info),
             "percentage": float(percentage.format(**info))
         }
-    except Exception as e:
-        output = {"text": f'{device.split("/")[-1]} cannot be found'}
+    except Exception as error:
+        output = {"text": f'{device.split("/")[-1]} cannot be found', 'tooltip': str(error)}
 
     print(json.dumps(output))
 
 
 if __name__ == "__main__":
+    # pylint: disable=no-value-for-parameter
     main()
