@@ -5,36 +5,6 @@ import sys
 import dbus
 import click
 
-TOOLTIP = """native-path:          {NativePath}
-vendor:               {Vendor}
-model:                {Model}
-serial:               {Serial}
-power supply:         {PowerSupply}
-updated:              {UpdateTime}
-has history:          {HasHistory}
-has statistics:       {HasStatistics}
-{Type}
-  present:             {IsPresent}
-  rechargeable:        {IsRechargeable}
-  state:               {State}
-  warning-level:       {WarningLevel}
-  online:              {Online}
-  energy:              {Energy} Wh
-  energy-empty:        {EnergyEmpty} Wh
-  energy-full:         {EnergyFull} Wh
-  energy-full-design:  {EnergyFullDesign} Wh
-  energy-rate:         {EnergyRate} W
-  voltage:             {Voltage} V
-  capacity:            {Capacity}%
-  percentage:          {Percentage}%
-  technology:          {Technology}
-  icon-name:           {IconName}
-  battery-level:       {BatteryLevel}
-  luminosity:          {Luminosity}
-  temperature:         {Temperature}
-  time-to-empty:       {TimeToEmpty}
-  time-to-full:        {TimeToFull}"""
-
 FBOOL = ('no', 'yes')
 PROPERTIES = {
     'BatteryLevel': ('unknown', 'none', 'low', 'critical', 'normal', 'high', 'full'),
@@ -73,6 +43,49 @@ PROPERTIES = {
     'Voltage': None,
     'WarningLevel': ('unknown', 'none', 'discharging', 'low', 'critical', 'action')
 }
+
+
+def get_tooltip(tooltip, _type):
+    #TOOLTIP_OTHER="""  luminosity:          {Luminosity}""" I don't a way to test this property
+    template = ('native-path:          {NativePath}'
+                '\nvendor:               {Vendor}'
+                '\nmodel:                {Model}'
+                '\nserial:               {Serial}'
+                '\npower supply:         {PowerSupply}'
+                '\nupdated:              {UpdateTime}'
+                '\nhas history:          {HasHistory}'
+                '\nhas statistics:       {HasStatistics}'
+                '\n{Type}'
+                '\n  warning-level:       {WarningLevel}'
+                '\n  icon-name:           {IconName}')
+
+    if tooltip:
+        return tooltip
+
+    if _type == 'line-power':
+        template += '\n  online:              {Online}'
+
+    else:
+        template += ('\n  percentage:          {Percentage}%'
+                     '\n  present:             {IsPresent}')
+
+    if _type == "battery":
+        template += ('\n  state:               {State}'
+                     '\n  rechargeable:        {IsRechargeable}'
+                     '\n  energy:              {Energy} Wh'
+                     '\n  energy-empty:        {EnergyEmpty} Wh'
+                     '\n  energy-full:         {EnergyFull} Wh'
+                     '\n  energy-full-design:  {EnergyFullDesign} Wh'
+                     '\n  energy-rate:         {EnergyRate} W'
+                     '\n  voltage:             {Voltage} V'
+                     '\n  capacity:            {Capacity}%'
+                     '\n  technology:          {Technology}'
+                     '\n  temperature:         {Temperature}'
+                     '\n  time-to-empty:       {TimeToEmpty}'
+                     '\n  time-to-full:        {TimeToFull}'
+                     '\n  battery-level:       {BatteryLevel}')
+
+    return template
 
 
 def device_info(bus, device):
@@ -125,7 +138,7 @@ def output_devices(bus, devices):
 @click.option('--device', '--model', help='Path or Model')
 @click.option('--text', show_default=True, default="{Model}")
 @click.option('--alt', show_default=True, default="{BatteryLevel}")
-@click.option('--tooltip', default=TOOLTIP, help="Similar to upower -i <device>")
+@click.option('--tooltip', default=None, help="Similar to upower -i <device>")
 @click.option('--class', '_class', show_default=True, default="{BatteryLevel}")
 @click.option('--percentage', show_default=True, default="{Percentage:.0f}")
 def main(list_devices, device, text, alt, tooltip, _class, percentage):
@@ -154,7 +167,7 @@ def main(list_devices, device, text, alt, tooltip, _class, percentage):
         output = {
             "text": text.format(**info),
             "alt": alt.format(**info),
-            "tooltip": tooltip.format(**info),
+            "tooltip": get_tooltip(tooltip, info['Type']).format(**info),
             "class": _class.format(**info),
             "percentage": float(percentage.format(**info))
         }
