@@ -45,7 +45,7 @@ PROPERTIES = {
 }
 
 
-def get_tooltip(tooltip, _type):
+def get_tooltip(_type):
     #TOOLTIP_OTHER="""  luminosity:          {Luminosity}""" I don't a way to test this property
     template = ('native-path:          {NativePath}'
                 '\nvendor:               {Vendor}'
@@ -58,9 +58,6 @@ def get_tooltip(tooltip, _type):
                 '\n{Type}'
                 '\n  warning-level:       {WarningLevel}'
                 '\n  icon-name:           {IconName}')
-
-    if tooltip:
-        return tooltip
 
     if _type == 'line-power':
         template += '\n  online:              {Online}'
@@ -167,7 +164,7 @@ def main(list_devices, device, text, alt, tooltip, _class, percentage):
         output = {
             "text": text.format(**info),
             "alt": alt.format(**info),
-            "tooltip": get_tooltip(tooltip, info['Type']).format(**info),
+            "tooltip": (tooltip if tooltip else get_tooltip(info['Type'])).format(**info),
             "class": _class.format(**info),
             "percentage": float(percentage.format(**info))
         }
