@@ -47,7 +47,7 @@ PROPERTIES = {
 
 
 def get_tooltip(_type):
-    #TOOLTIP_OTHER="""  luminosity:          {Luminosity}""" I don't a way to test this property
+    #TOOLTIP_OTHER="""  luminosity:          {Luminosity}""" I don't have a way to test this property
     header = ('native-path:          {NativePath}'
               '\npower supply:         {PowerSupply}'
               '\nupdated:              {UpdateTime}'
