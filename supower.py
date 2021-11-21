@@ -23,7 +23,7 @@ has statistics:       {HasStatistics}
   energy-empty:        {EnergyEmpty} Wh
   energy-full:         {EnergyFull} Wh
   energy-full-design:  {EnergyFullDesign} Wh
-  energy-rate:         {EnergyRatev} W
+  energy-rate:         {EnergyRate} W
   voltage:             {Voltage} V
   capacity:            {Capacity}%
   percentage:          {Percentage}%
@@ -43,7 +43,7 @@ PROPERTIES = {
     'EnergyEmpty': None,
     'EnergyFull': None,
     'EnergyFullDesign': None,
-    'EnergyRatev': None,
+    'EnergyRate': None,
     'HasHistory': FBOOL,
     'HasStatistics': FBOOL,
     'IconName': None,
@@ -85,7 +85,7 @@ def device_info(bus, device):
             data = device_interface.Get('org.freedesktop.UPower.Device', _property)
             result[_property] = friendly_name[data] if friendly_name else data
         except dbus.exceptions.DBusException:
-            result[_property] = None
+            result[_property] = 'none'
 
     return result
 
@@ -132,7 +132,7 @@ def main(list_devices, device, text, alt, tooltip, _class, percentage):
     """
     TEXT can be replaced using one or more {KEY}\n
     {BatteryLevel} {Capacity} {Energy} {EnergyEmpty} {EnergyFull}
-    {EnergyFullDesign} {EnergyRatev} {HasHistory} {HasStatistics}
+    {EnergyFullDesign} {EnergyRate} {HasHistory} {HasStatistics}
     {IconName} {IsPresent} {IsRechargeable} {Luminosity}
     {Model} {NativePath} {Online} {Percentage} {PowerSupply}
     {Serial} {State} {Technology} {Temperature} {TimeToEmpty}
