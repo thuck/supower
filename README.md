@@ -24,6 +24,29 @@ Upower module for waybar
     }
 ```
 
+```
+"custom/battery": {
+     "format": "{} {icon}",
+     "return-type": "json",
+     "exec": "$HOME/.config/waybar/scripts/supower.py --model '02DL007'",
+     "interval": 5,
+     "format-icons": ["", "", "", "", ""]
+    }
+```
+
+```
+"custom/line": {
+     "format": "{icon}",
+     "return-type": "json",
+     "exec": "$HOME/.config/waybar/scripts/supower.py --model '/org/freedesktop/UPower/devices/line_power_AC' --alt '{Online}'",
+     "interval": 5,
+     "format-icons": {
+       "yes": "",
+       "no": ""
+     }
+    }
+```
+
 # Helper
 
 Lists devices showing their path and model.  
