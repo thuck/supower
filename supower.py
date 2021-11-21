@@ -62,14 +62,14 @@ def get_tooltip(_type):
         body += '\n  online:              {Online}'
 
     else:
-        header += ('\nvendor:               {Vendor}'
-                   '\nmodel:                {Model}'
+        header += ('\nmodel:                {Model}'
                    '\nserial:               {Serial}')
 
         body += ('\n  percentage:          {Percentage}%'
                  '\n  present:             {IsPresent}')
 
     if _type == "battery":
+        header += ('\nvendor:               {Vendor}')
         body += ('\n  state:               {State}'
                  '\n  rechargeable:        {IsRechargeable}'
                  '\n  energy:              {Energy} Wh'
@@ -85,7 +85,7 @@ def get_tooltip(_type):
                  '\n  time-to-full:        {TimeToFull}'
                  '\n  battery-level:       {BatteryLevel}')
 
-    return header + body
+    return f'{header}{body}'
 
 
 def device_info(bus, device):
