@@ -2,6 +2,7 @@
 # pylint: disable=missing-module-docstring
 import json
 import sys
+import time
 import dbus
 import click
 
@@ -95,7 +96,10 @@ def device_info(bus, device):
     for _property, friendly_name in PROPERTIES.items():
         try:
             data = device_interface.Get('org.freedesktop.UPower.Device', _property)
-            result[_property] = friendly_name[data] if friendly_name else data
+            if _property == 'UpdateTime':
+                result[_property] = time.ctime(data)
+            else:
+                result[_property] = friendly_name[data] if friendly_name else data
         except dbus.exceptions.DBusException:
             result[_property] = 'none'
 
