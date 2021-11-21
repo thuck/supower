@@ -14,6 +14,16 @@ Upower module for waybar
     }
 ```
 
+```
+"custom/headset": {
+     "format": " {icon}",
+     "return-type": "json",
+     "exec": "$HOME/.config/waybar/scripts/supower.py --model 'MDR-1000X'",
+     "interval": 5,
+     "format-icons": ["", "", "", "", ""]
+    }
+```
+
 # Helper
 
 Lists devices showing their path and model.  
