@@ -5,7 +5,37 @@ import click
 import json
 import sys
 
+TOOLTIP = """native-path:          {NativePath}
+vendor:               {Vendor}
+model:                {Model}
+serial:               {Serial}
+power supply:         {PowerSupply}
+updated:              {UpdateTime}
+has history:          {HasHistory}
+has statistics:       {HasStatistics}
+{Type}
+  present:             {IsPresent}
+  rechargeable:        {IsRechargeable}
+  state:               {State}
+  warning-level:       {WarningLevel}
+  online:              {Online}
+  energy:              {Energy} Wh
+  energy-empty:        {EnergyEmpty} Wh
+  energy-full:         {EnergyFull} Wh
+  energy-full-design:  {EnergyFullDesign} Wh
+  energy-rate:         {EnergyRatev} W
+  voltage:             {Voltage} V
+  capacity:            {Capacity}%
+  percentage:          {Percentage}%
+  technology:          {Technology}
+  icon-name:           {IconName}
+  battery-level:       {BatteryLevel}
+  luminosity:          {Luminosity}
+  temperature:         {Temperature}
+  time-to-empty:       {TimeToEmpty}
+  time-to-full:        {TimeToFull}"""
 
+FBOOL = ('no', 'yes')
 PROPERTIES = {
     'BatteryLevel': ('unknown', 'none', 'low', 'critical', 'normal', 'high', 'full'),
     'Capacity': None,
@@ -14,17 +44,17 @@ PROPERTIES = {
     'EnergyFull': None,
     'EnergyFullDesign': None,
     'EnergyRatev': None,
-    'HasHistory': None,
-    'HasStatistics': None,
+    'HasHistory': FBOOL,
+    'HasStatistics': FBOOL,
     'IconName': None,
-    'IsPresent': None,
-    'IsRechargeable': None,
+    'IsPresent': FBOOL,
+    'IsRechargeable': FBOOL,
     'Luminosity': None,
     'Model': None,
     'NativePath': None,
-    'Online': None,
+    'Online': FBOOL,
     'Percentage': None,
-    'PowerSupply': None,
+    'PowerSupply': FBOOL,
     'Serial': None,
     'State': ('unknown', 'charging', 'discharging', 'empty', 'fully charged', 'pending charge', 'pending discharge'),
     'Technology': ('unknown', 'lithium ion', 'lithium polymer', 'lithium iron phosphate', 'lead acid', 'nickel cadmium', 'nickel metal hydride'),
@@ -51,7 +81,7 @@ def device_info(bus, device):
             data = device_interface.Get('org.freedesktop.UPower.Device', _property)
             result[_property] = friendly_name[data] if friendly_name else data
         except dbus.exceptions.DBusException:
-            pass
+            result[_property] = None
 
     return result
 
@@ -83,7 +113,7 @@ def output_devices(bus, devices):
 @click.option('--device', '--model', help='Path or Model')
 @click.option('--text', show_default = True, default="{Model}")
 @click.option('--alt', show_default = True, default="{BatteryLevel}")
-@click.option('--tooltip', show_default = True, default="{Type}\n{NativePath}")
+@click.option('--tooltip', default=TOOLTIP, help="Similar to upower -i <device>")
 @click.option('--class', '_class', show_default = True, default="{BatteryLevel}")
 @click.option('--percentage', show_default = True, default="{Percentage:.0f}")
 def main(list_devices, device, text, alt, tooltip, _class, percentage):
