@@ -47,42 +47,44 @@ PROPERTIES = {
 
 def get_tooltip(_type):
     #TOOLTIP_OTHER="""  luminosity:          {Luminosity}""" I don't a way to test this property
-    template = ('native-path:          {NativePath}'
-                '\nvendor:               {Vendor}'
-                '\nmodel:                {Model}'
-                '\nserial:               {Serial}'
+    header = ('native-path:          {NativePath}'
                 '\npower supply:         {PowerSupply}'
                 '\nupdated:              {UpdateTime}'
                 '\nhas history:          {HasHistory}'
-                '\nhas statistics:       {HasStatistics}'
-                '\n{Type}'
-                '\n  warning-level:       {WarningLevel}'
-                '\n  icon-name:           {IconName}')
+                '\nhas statistics:       {HasStatistics}')
+
+    body = ('\n{Type}'
+            '\n  warning-level:       {WarningLevel}'
+            '\n  icon-name:           {IconName}')
 
     if _type == 'line-power':
-        template += '\n  online:              {Online}'
+        body += '\n  online:              {Online}'
 
     else:
-        template += ('\n  percentage:          {Percentage}%'
-                     '\n  present:             {IsPresent}')
+        header += ('\nvendor:               {Vendor}'
+                   '\nmodel:                {Model}'
+                   '\nserial:               {Serial}')
+
+        body += ('\n  percentage:          {Percentage}%'
+                 '\n  present:             {IsPresent}')
 
     if _type == "battery":
-        template += ('\n  state:               {State}'
-                     '\n  rechargeable:        {IsRechargeable}'
-                     '\n  energy:              {Energy} Wh'
-                     '\n  energy-empty:        {EnergyEmpty} Wh'
-                     '\n  energy-full:         {EnergyFull} Wh'
-                     '\n  energy-full-design:  {EnergyFullDesign} Wh'
-                     '\n  energy-rate:         {EnergyRate} W'
-                     '\n  voltage:             {Voltage} V'
-                     '\n  capacity:            {Capacity}%'
-                     '\n  technology:          {Technology}'
-                     '\n  temperature:         {Temperature}'
-                     '\n  time-to-empty:       {TimeToEmpty}'
-                     '\n  time-to-full:        {TimeToFull}'
-                     '\n  battery-level:       {BatteryLevel}')
+        body += ('\n  state:               {State}'
+                 '\n  rechargeable:        {IsRechargeable}'
+                 '\n  energy:              {Energy} Wh'
+                 '\n  energy-empty:        {EnergyEmpty} Wh'
+                 '\n  energy-full:         {EnergyFull} Wh'
+                 '\n  energy-full-design:  {EnergyFullDesign} Wh'
+                 '\n  energy-rate:         {EnergyRate} W'
+                 '\n  voltage:             {Voltage} V'
+                 '\n  capacity:            {Capacity}%'
+                 '\n  technology:          {Technology}'
+                 '\n  temperature:         {Temperature}'
+                 '\n  time-to-empty:       {TimeToEmpty}'
+                 '\n  time-to-full:        {TimeToFull}'
+                 '\n  battery-level:       {BatteryLevel}')
 
-    return template
+    return header + body
 
 
 def device_info(bus, device):
