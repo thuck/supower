@@ -28,7 +28,8 @@ Upower module for waybar
 "custom/battery": {
      "format": "{} {icon}",
      "return-type": "json",
-     "exec": "$HOME/.config/waybar/scripts/supower.py --model '02DL007'",
+     "exec": "$HOME/.config/waybar/scripts/supower.py --model '02DL007' --text '{NativePath}'",
+     "exec-if": "$HOME/.config/waybar/scripts/supower.py --model '/org/freedesktop/UPower/devices/line_power_AC' --check 'Online'",
      "interval": 5,
      "format-icons": ["", "", "", "", ""]
     }

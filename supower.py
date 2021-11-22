@@ -135,16 +135,20 @@ def output_devices(bus, devices):
         print(f'{device}\t{device_info(bus, device).get("Model")}')
     sys.exit(0)
 
+def check_device(key, info):
+    sys.exit(FBOOL.index(info.get(key.replace('{','').replace('}', ''))))
+
 
 @click.command()
 @click.option('--list-devices', is_flag=True, help='List devices and models')
+@click.option('--check', help='Exists using boolean values for device')
 @click.option('--device', '--model', help='Path or Model')
 @click.option('--text', show_default=True, default="{Model}")
 @click.option('--alt', show_default=True, default="{BatteryLevel}")
 @click.option('--tooltip', default=None, help="Similar to upower -i <device>")
 @click.option('--class', '_class', show_default=True, default="{BatteryLevel}")
 @click.option('--percentage', show_default=True, default="{Percentage:.0f}")
-def main(list_devices, device, text, alt, tooltip, _class, percentage):
+def main(list_devices, check, device, text, alt, tooltip, _class, percentage):
     """
     TEXT can be replaced using one or more {KEY}\n
     {BatteryLevel} {Capacity} {Energy} {EnergyEmpty} {EnergyFull}
@@ -155,9 +159,11 @@ def main(list_devices, device, text, alt, tooltip, _class, percentage):
     {TimeToFull} {Type} {UpdateTime} {Vendor} {Voltage}
     {WarningLevel}
 
-    Example: upower.py --model 'MX Master 2S' --tooltip '{State}'
+    Example: supower.py --model 'MX Master 2S' --tooltip '{State}'
+             supower.py --model '/org/freedesktop/UPower/devices/line_power_AC' --check Online
 
     """
+    exit = 0
     bus = dbus.SystemBus()
     devices = get_devices(bus)
 
@@ -167,6 +173,9 @@ def main(list_devices, device, text, alt, tooltip, _class, percentage):
     try:
         device = get_device(bus, devices, device)
         info = device_info(bus, device)
+        if check:
+            check_device(check, info)
+
         output = {
             "text": text.format(**info),
             "alt": alt.format(**info),
@@ -175,9 +184,11 @@ def main(list_devices, device, text, alt, tooltip, _class, percentage):
             "percentage": float(percentage.format(**info))
         }
     except Exception as error:
-        output = {"text": f'{device.split("/")[-1]} cannot be found', 'tooltip': str(error)}
+        output = {"text": f'Error {device.split("/")[-1]} {error}', 'tooltip': f'{error}'}
+        exit = 2
 
     print(json.dumps(output))
+    sys.exit(exit)
 
 
 if __name__ == "__main__":
