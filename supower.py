@@ -100,7 +100,7 @@ def device_info(bus, device):
                 result[_property] = time.ctime(data)
             else:
                 result[_property] = friendly_name[data] if friendly_name else data
-        except dbus.exceptions.DBusException:
+        except (dbus.exceptions.DBusException, IndexError):
             result[_property] = 'none'
 
     return result
